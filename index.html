@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cal+Sans&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #FFFFFF; }
+    @keyframes dropperFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  </style>
+</helmet>
+
+<div style="font-family: Outfit, sans-serif; color: #0B1220; background: #FFFFFF; min-height: 100vh;">
+
+  <!-- NAV -->
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 20px 64px; max-width: 1280px; margin: 0 auto; box-sizing: border-box;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="https://sendabox-s3.sfo3.cdn.digitaloceanspaces.com/dropper/assets/logo.png" alt="Dropper" style="height: 34px; display: block;">
+    </div>
+    <nav style="display: flex; align-items: center; gap: 36px; font-size: 16px; font-weight: 500; color: #334155;">
+      <a href="#servicios" style="color: #334155; text-decoration: none;" style-hover="color: #48AD40;">Servicios</a>
+      <a href="#cobertura" style="color: #334155; text-decoration: none;" style-hover="color: #48AD40;">Cobertura</a>
+      <a href="#empresas" style="color: #334155; text-decoration: none;" style-hover="color: #48AD40;">Para negocios</a>
+      <a href="#" style="color: #334155; text-decoration: none;" style-hover="color: #48AD40;">Iniciar sesión</a>
+      <a href="#rastreo" style="background: {{ accent }}; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 14px; font-weight: 600;" style-hover="filter: brightness(1.08);">Cotizar envío</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section id="rastreo" data-screen-label="Hero" style="max-width: 1280px; margin: 0 auto; padding: 64px 64px 88px; box-sizing: border-box; display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 72px; align-items: center;">
+    <div style="display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; background: #F0F9EF; color: #2E7D28; font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 999px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ accent }}; display: inline-block;"></span>
+        Entregas el mismo día en Ciudad de Guatemala
+      </div>
+      <h1 style="font-family: 'Cal Sans', sans-serif; font-size: 62px; line-height: 1.05; margin: 0; font-weight: 400; letter-spacing: -0.01em;">
+        Tu paquete, <span style="color: {{ accent }};">sin vueltas.</span>
+      </h1>
+      <p style="font-size: 19px; line-height: 1.6; color: #475569; margin: 0; max-width: 480px; text-wrap: pretty;">
+        Recolectamos en tu puerta, entregamos en la suya. Mensajería local y nacional con rastreo en tiempo real y precios claros desde el primer clic.
+      </p>
+
+      <!-- Tracker / quote box -->
+      <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06); max-width: 520px;">
+        <div style="display: flex; gap: 4px; background: #F1F5F9; border-radius: 12px; padding: 4px; align-self: flex-start;">
+          <button onClick="{{ setModeTrack }}" style="border: none; cursor: pointer; font-family: Outfit, sans-serif; font-size: 15px; font-weight: 600; padding: 8px 18px; border-radius: 9px; background: {{ trackTabBg }}; color: {{ trackTabColor }};">Rastrear</button>
+          <button onClick="{{ setModeQuote }}" style="border: none; cursor: pointer; font-family: Outfit, sans-serif; font-size: 15px; font-weight: 600; padding: 8px 18px; border-radius: 9px; background: {{ quoteTabBg }}; color: {{ quoteTabColor }};">Cotizar</button>
+        </div>
+        <sc-if value="{{ isTrack }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; gap: 10px;">
+              <input value="{{ trackCode }}" onChange="{{ onTrackChange }}" onKeyDown="{{ onTrackKey }}" placeholder="Número de guía, ej. DR-92B5911E" style="flex: 1; font-family: Outfit, sans-serif; font-size: 16px; padding: 14px 16px; border: 1px solid #E2E8F0; border-radius: 12px; outline: none; color: #000000; background: transparent; text-transform: uppercase;" style-focus="border-color: #48AD40;">
+              <button onClick="{{ doTrack }}" style="border: none; cursor: pointer; font-family: Outfit, sans-serif; font-size: 16px; font-weight: 600; padding: 14px 26px; border-radius: 14px; background: {{ accent }}; color: #FFFFFF; white-space: nowrap;" style-hover="filter: brightness(1.08);">{{ trackBtnLabel }}</button>
+            </div>
+
+            <sc-if value="{{ trackError }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 14px; color: #B91C1C; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 12px 14px;">{{ trackError }}</div>
+            </sc-if>
+
+            <sc-if value="{{ trackShow }}" hint-placeholder-val="{{ false }}">
+              <div style="border: 1px solid #E2E8F0; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 18px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                  <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #94A3B8;">Guía</span>
+                    <span style="font-family: 'Cal Sans', sans-serif; font-size: 22px; color: #0B1220;">{{ trackResultCode }}</span>
+                  </div>
+                  <span style="font-size: 14px; font-weight: 700; padding: 8px 16px; border-radius: 999px; background: {{ trackBadgeBg }}; color: {{ trackBadgeColor }};">{{ trackBadgeLabel }}</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column;">
+                  <sc-for list="{{ trackSteps }}" as="st" hint-placeholder-count="5">
+                    <div style="display: grid; grid-template-columns: 28px 1fr; gap: 14px;">
+                      <div style="display: flex; flex-direction: column; align-items: center;">
+                        <span style="width: 16px; height: 16px; border-radius: 50%; background: {{ st.dotBg }}; border: 2px solid {{ st.dotBorder }}; box-sizing: border-box; flex-shrink: 0;"></span>
+                        <span style="width: 2px; flex: 1; min-height: 22px; background: {{ st.lineColor }};"></span>
+                      </div>
+                      <div style="padding-bottom: 16px; display: flex; flex-direction: column; gap: 1px;">
+                        <span style="font-size: 15px; font-weight: 600; color: {{ st.titleColor }};">{{ st.label }}</span>
+                        <span style="font-size: 13px; color: #94A3B8;">{{ st.desc }}</span>
+                        <sc-if value="{{ st.dateStr }}" hint-placeholder-val="{{ false }}">
+                          <span style="font-size: 12px; color: #48AD40; font-weight: 600; margin-top: 2px;">{{ st.dateStr }}</span>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <sc-if value="{{ trackHasMeta }}" hint-placeholder-val="{{ false }}">
+                  <div style="border-top: 1px solid #F1F5F9; padding-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <sc-for list="{{ trackMetaRows }}" as="row" hint-placeholder-count="2">
+                      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                        <span style="font-size: 13px; color: #94A3B8;">{{ row.k }}</span>
+                        <span style="font-size: 14px; font-weight: 600; color: #334155; text-align: right;">{{ row.v }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ trackNote }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size: 12px; color: #94A3B8; background: #F8FAFC; border-radius: 8px; padding: 10px 12px;">{{ trackNote }}</div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isQuote }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; gap: 10px;">
+              <select value="{{ quoteDest }}" onChange="{{ onDestChange }}" style="flex: 1.4; font-family: Outfit, sans-serif; font-size: 16px; padding: 14px 12px; border: 1px solid #E2E8F0; border-radius: 12px; outline: none; color: #000000; background: transparent; cursor: pointer;" style-focus="border-color: #48AD40;">
+                <option value="">Municipio de destino…</option>
+                <sc-for list="{{ municipios }}" as="m" hint-placeholder-count="8">
+                  <option value="{{ m.id }}">{{ m.name }}</option>
+                </sc-for>
+              </select>
+              <select value="{{ quoteService }}" onChange="{{ onServiceChange }}" style="flex: 1; font-family: Outfit, sans-serif; font-size: 16px; padding: 14px 12px; border: 1px solid #E2E8F0; border-radius: 12px; outline: none; color: #000000; background: transparent; cursor: pointer;" style-focus="border-color: #48AD40;">
+                <option value="estandar">Envío Estándar</option>
+                <option value="express">Envío Express</option>
+              </select>
+            </div>
+            <sc-if value="{{ hasQuote }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #F0F9EF; border: 1px solid #D5EBD2; border-radius: 12px; padding: 14px 18px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 15px; font-weight: 600; color: #0B1220;">{{ quoteTitle }}</span>
+                  <span style="font-size: 13px; color: #2E7D28;">{{ quoteNote }}</span>
+                </div>
+                <span style="font-family: 'Cal Sans', sans-serif; font-size: 28px; color: {{ accent }}; white-space: nowrap;">{{ quotePrice }}</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- Hero visual placeholder -->
+    <div style="position: relative;">
+      <div style="width: 100%; aspect-ratio: 4 / 4.4; border-radius: 24px; background: repeating-linear-gradient(45deg, #F0F9EF, #F0F9EF 14px, #E6F4E4 14px, #E6F4E4 28px); display: flex; align-items: center; justify-content: center;">
+        <span style="font-family: monospace; font-size: 14px; color: #2E7D28; background: rgba(255,255,255,0.85); padding: 8px 14px; border-radius: 8px;">foto: repartidor entregando paquete</span>
+      </div>
+      <div style="position: absolute; left: -28px; bottom: 48px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px 20px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10); display: flex; align-items: center; gap: 14px; animation: dropperFloat 5s ease-in-out infinite;">
+        <div style="width: 42px; height: 42px; border-radius: 12px; background: #F0F9EF; display: flex; align-items: center; justify-content: center; color: {{ accent }}; font-size: 20px;">✓</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 15px; font-weight: 600;">Entregado · 12:42 pm</span>
+          <span style="font-size: 13px; color: #64748B;">Guía DRP-402193 · Firmado por M. Ríos</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section id="servicios" data-screen-label="Servicios" style="background: #F8FAF8; padding: 88px 64px;">
+    <div style="max-width: 1280px; margin: 0 auto;">
+      <h2 style="font-family: 'Cal Sans', sans-serif; font-size: 44px; font-weight: 400; margin: 0 0 12px; letter-spacing: -0.01em;">Un servicio para cada envío</h2>
+      <p style="font-size: 18px; color: #475569; margin: 0 0 48px; max-width: 560px; text-wrap: pretty;">Desde el sobre urgente hasta la logística completa de tu tienda en línea.</p>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+        <sc-for list="{{ services }}" as="svc" hint-placeholder-count="3">
+          <div style="background: #FFFFFF; border: 1px solid #E8EDE8; border-radius: 18px; padding: 32px 28px; display: flex; flex-direction: column; gap: 14px;" style-hover="border-color: #48AD40; box-shadow: 0 12px 28px rgba(72, 173, 64, 0.10);">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: #F0F9EF; display: flex; align-items: center; justify-content: center; font-size: 22px;">{{ svc.icon }}</div>
+            <h3 style="font-family: 'Cal Sans', sans-serif; font-size: 24px; font-weight: 400; margin: 0;">{{ svc.title }}</h3>
+            <p style="font-size: 16px; line-height: 1.6; color: #475569; margin: 0; text-wrap: pretty;">{{ svc.desc }}</p>
+            <span style="font-size: 15px; font-weight: 600; color: {{ accent }}; margin-top: auto;">{{ svc.meta }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- COBERTURA / CÓMO FUNCIONA -->
+  <section id="cobertura" data-screen-label="Cobertura" style="max-width: 1280px; margin: 0 auto; padding: 88px 64px; box-sizing: border-box; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 72px; align-items: center;">
+    <div style="width: 100%; aspect-ratio: 5 / 4; border-radius: 24px; background: repeating-linear-gradient(45deg, #F1F5F9, #F1F5F9 14px, #E9EEF4 14px, #E9EEF4 28px); display: flex; align-items: center; justify-content: center;">
+      <span style="font-family: monospace; font-size: 14px; color: #475569; background: rgba(255,255,255,0.85); padding: 8px 14px; border-radius: 8px;">mapa: 8 municipios del depto. de Guatemala</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 32px;">
+      <h2 style="font-family: 'Cal Sans', sans-serif; font-size: 44px; font-weight: 400; margin: 0; letter-spacing: -0.01em;">Así de simple</h2>
+      <div style="display: flex; flex-direction: column; gap: 28px;">
+        <sc-for list="{{ steps }}" as="step" hint-placeholder-count="3">
+          <div style="display: flex; gap: 20px; align-items: flex-start;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: {{ accent }}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; flex-shrink: 0;">{{ step.n }}</div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 19px; font-weight: 600;">{{ step.title }}</span>
+              <span style="font-size: 16px; line-height: 1.6; color: #475569; text-wrap: pretty;">{{ step.desc }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA EMPRESAS -->
+  <section id="empresas" data-screen-label="Para negocios" style="padding: 0 64px 96px;">
+    <div style="max-width: 1280px; margin: 0 auto; background: #0F1B0E; border-radius: 28px; padding: 72px 80px; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 48px; align-items: center;">
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <h2 style="font-family: 'Cal Sans', sans-serif; font-size: 44px; font-weight: 400; margin: 0; color: #FFFFFF; letter-spacing: -0.01em;">¿Vendes en línea? Nosotros entregamos.</h2>
+        <p style="font-size: 18px; line-height: 1.6; color: #B9CBB7; margin: 0; max-width: 520px; text-wrap: pretty;">Tarifas por volumen, recolecciones programadas e integración con tu tienda. Un ejecutivo te responde el mismo día.</p>
+        <div style="display: flex; gap: 14px; margin-top: 8px;">
+          <a href="#" style="background: {{ accent }}; color: #FFFFFF; text-decoration: none; padding: 15px 30px; border-radius: 14px; font-weight: 600; font-size: 16px;" style-hover="filter: brightness(1.1);">Hablar con ventas</a>
+          <a href="#" style="background: transparent; color: #FFFFFF; border: 1px solid #3A4A38; text-decoration: none; padding: 15px 30px; border-radius: 14px; font-weight: 600; font-size: 16px;" style-hover="border-color: #48AD40;">Ver tarifas</a>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <sc-for list="{{ stats }}" as="stat" hint-placeholder-count="4">
+          <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-family: 'Cal Sans', sans-serif; font-size: 32px; color: {{ accent }};">{{ stat.value }}</span>
+            <span style="font-size: 14px; color: #B9CBB7;">{{ stat.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="border-top: 1px solid #E2E8F0; padding: 40px 64px;">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+      <img src="https://sendabox-s3.sfo3.cdn.digitaloceanspaces.com/dropper/assets/logo.png" alt="Dropper" style="height: 26px; display: block; opacity: 0.9;">
+      <nav style="display: flex; gap: 28px; font-size: 15px;">
+        <a href="#" style="color: #94A3B8; text-decoration: none;" style-hover="color: #48AD40;">Términos</a>
+        <a href="#" style="color: #94A3B8; text-decoration: none;" style-hover="color: #48AD40;">Privacidad</a>
+        <a href="#" style="color: #94A3B8; text-decoration: none;" style-hover="color: #48AD40;">Ayuda</a>
+        <a href="#" style="color: #94A3B8; text-decoration: none;" style-hover="color: #48AD40;">Únete como repartidor</a>
+      </nav>
+      <span style="font-size: 14px; color: #94A3B8;">© 2026 Dropper</span>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;accentColor&quot;: {
+    &quot;editor&quot;: &quot;color&quot;,
+    &quot;default&quot;: &quot;#48AD40&quot;,
+    &quot;tsType&quot;: &quot;string&quot;,
+    &quot;options&quot;: [&quot;#48AD40&quot;, &quot;#2A9D8F&quot;, &quot;#E76F51&quot;, &quot;#2A6FDB&quot;],
+    &quot;section&quot;: &quot;Marca&quot;
+  },
+  &quot;apiBase&quot;: {
+    &quot;editor&quot;: &quot;text&quot;,
+    &quot;default&quot;: &quot;/api/v1&quot;,
+    &quot;tsType&quot;: &quot;string&quot;,
+    &quot;section&quot;: &quot;Rastreo (API Sendabox)&quot;
+  },
+  &quot;tenantId&quot;: {
+    &quot;editor&quot;: &quot;text&quot;,
+    &quot;default&quot;: &quot;droppergt&quot;,
+    &quot;tsType&quot;: &quot;string&quot;,
+    &quot;section&quot;: &quot;Rastreo (API Sendabox)&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = { mode: 'track', quoteDest: '', quoteService: 'estandar', trackCode: '', trackLoading: false, trackResult: null, trackError: '', trackDemo: false };
+
+  API_BASE = '/api/v1'; // proxy en el mismo dominio (evita CORS). En preview cae a demo.
+
+  STATE_LABELS = {
+    pending: { label: 'Guía generada', desc: 'Tu guía fue creada correctamente' },
+    pickup: { label: 'Paquete recolectado', desc: 'Recogimos tu paquete' },
+    assigned: { label: 'Mensajero asignado', desc: 'Un mensajero tiene tu envío' },
+    in_transit: { label: 'En camino', desc: 'Tu paquete va en ruta al destino' },
+    delivered: { label: 'Entregado', desc: 'Paquete entregado con éxito' },
+    incident: { label: 'Incidencia', desc: 'Reportamos un problema con el envío' },
+    attempted_delivery: { label: 'Entrega fallida', desc: 'Intentamos entregar sin éxito' },
+    cancelled: { label: 'Cancelado', desc: 'El envío fue cancelado' },
+    devolution: { label: 'En devolución', desc: 'Regresando al remitente' },
+    returned: { label: 'Devuelto', desc: 'Entregado de vuelta al remitente' }
+  };
+
+  fmtDate(s) {
+    if (!s) return '';
+    try {
+      return new Date(s).toLocaleString('es-GT', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch (e) { return s; }
+  }
+
+  async doTrack() {
+    const code = (this.state.trackCode || '').trim().toUpperCase();
+    if (!code) { this.setState({ trackError: 'Ingresa tu número de guía.', trackResult: null }); return; }
+    this.setState({ trackLoading: true, trackError: '', trackResult: null });
+    const base = this.props.apiBase || this.API_BASE;
+    const tenant = this.props.tenantId || 'droppergt';
+    try {
+      const r = await fetch(base + '/tracking/' + encodeURIComponent(code), { headers: { 'x-tenant-id': tenant } });
+      if (!r.ok) throw new Error('status ' + r.status);
+      const data = await r.json();
+      const parsed = this.parseTracking(code, data);
+      if (!parsed) { this.setState({ trackLoading: false, trackError: 'No encontramos esa guía. Verifica el número e inténtalo de nuevo.' }); return; }
+      this.setState({ trackLoading: false, trackResult: parsed, trackDemo: false });
+    } catch (e) {
+      // En la vista previa (otro dominio) la API bloquea por CORS → mostramos una demo.
+      this.setState({ trackLoading: false, trackResult: this.demoResult(code), trackDemo: true });
+    }
+  }
+
+  parseTracking(code, data) {
+    const events = Array.isArray(data.trackingEvents) ? data.trackingEvents.slice() : [];
+    if (!events.length) return null;
+    events.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const stateTime = {};
+    events.forEach(e => {
+      const cur = stateTime[e.newState];
+      if (!cur || new Date(e.createdAt) < new Date(cur)) stateTime[e.newState] = e.createdAt;
+    });
+    let deliveredTo = data.deliveredTo;
+    if (deliveredTo && typeof deliveredTo === 'object') deliveredTo = deliveredTo.name || deliveredTo.fullName || '';
+    return {
+      orderId: code,
+      state: events[0].newState,
+      updatedAt: events[0].createdAt,
+      stateTime,
+      deliveredTo: deliveredTo || null,
+      attempts: Array.isArray(data.attempts) ? data.attempts : []
+    };
+  }
+
+  demoResult(code) {
+    const now = Date.now();
+    return {
+      orderId: code,
+      state: 'in_transit',
+      updatedAt: new Date(now - 42 * 60000).toISOString(),
+      stateTime: {
+        pending: new Date(now - 6 * 3600000).toISOString(),
+        pickup: new Date(now - 4 * 3600000).toISOString(),
+        assigned: new Date(now - 3 * 3600000).toISOString(),
+        in_transit: new Date(now - 42 * 60000).toISOString()
+      },
+      deliveredTo: null,
+      attempts: []
+    };
+  }
+
+  buildSteps(st) {
+    const L = this.STATE_LABELS;
+    const base = ['pending', 'pickup', 'assigned', 'in_transit'];
+    const order = ['pending', 'pickup', 'assigned', 'in_transit', 'delivered'];
+    const GREEN = '#48AD40', GREY = '#CBD5E1', RED = '#DC2626', AMBER = '#D97706', BLUE = '#2563EB';
+    const norm = order.indexOf(st);
+    const mk = (key, label, desc, tone, current) => {
+      const active = tone !== 'todo';
+      const c = tone === 'todo' ? GREY : tone === 'red' ? RED : tone === 'amber' ? AMBER : tone === 'blue' ? BLUE : GREEN;
+      return {
+        key, label, desc,
+        dotBg: active ? c : '#FFFFFF',
+        dotBorder: c,
+        lineColor: active ? c : GREY,
+        titleColor: active ? '#0B1220' : '#94A3B8'
+      };
+    };
+    const steps = [];
+    if (st === 'cancelled') {
+      base.forEach(s => steps.push(mk(s, L[s].label, L[s].desc, 'todo', false)));
+      steps.push(mk('cancelled', 'Cancelado', L.cancelled.desc, 'red', true));
+      return steps;
+    }
+    base.forEach((s, i) => {
+      let tone = 'todo', current = false;
+      if (norm >= 0) { if (i < norm) tone = 'done'; else if (i === norm) { tone = 'done'; current = true; } }
+      else { tone = 'done'; } // estados de excepción: base completada
+      steps.push(mk(s, L[s].label, L[s].desc, tone, current));
+    });
+    if (st === 'delivered') {
+      steps.push(mk('delivered', 'Entregado', L.delivered.desc, 'done', true));
+    } else if (st === 'attempted_delivery' || st === 'incident') {
+      steps.push(mk(st, L[st].label, L[st].desc, 'red', true));
+    } else if (st === 'devolution') {
+      steps.push(mk('devolution', L.devolution.label, L.devolution.desc, 'amber', true));
+    } else if (st === 'returned') {
+      steps.push(mk('returned', L.returned.label, L.returned.desc, 'blue', true));
+    } else {
+      steps.push(mk('delivered', 'Entregado', L.delivered.desc, 'todo', false));
+    }
+    return steps;
+  }
+
+  municipios = [
+    { id: 'guatemala', name: 'Ciudad de Guatemala', estandar: 25, express: 40 },
+    { id: 'fraijanes', name: 'Fraijanes', estandar: 45, express: 75 },
+    { id: 'mixco', name: 'Mixco', estandar: 30, express: 60 },
+    { id: 'sj-pinula', name: 'San José Pinula', estandar: 45, express: 75 },
+    { id: 'sm-petapa', name: 'San Miguel Petapa', estandar: 35, express: 65 },
+    { id: 'sc-pinula', name: 'Santa Catarina Pinula', estandar: 40, express: 70 },
+    { id: 'villa-canales', name: 'Villa Canales (solo Boca del Monte)', estandar: 40, express: 70 },
+    { id: 'villa-nueva', name: 'Villa Nueva', estandar: 35, express: 65 }
+  ];
+
+  renderVals() {
+    const accent = this.props.accentColor ?? '#48AD40';
+    const isTrack = this.state.mode === 'track';
+    const dest = this.municipios.find(m => m.id === this.state.quoteDest);
+    const svcLabel = this.state.quoteService === 'express' ? 'Envío Express' : 'Envío Estándar';
+    const price = dest ? dest[this.state.quoteService] : null;
+    let quoteTitle = '', quoteNote = '', quotePrice = '';
+    if (dest) {
+      if (price != null) {
+        quoteTitle = svcLabel + ' a ' + dest.name.replace(' (solo Boca del Monte)', '');
+        quoteNote = dest.id === 'villa-canales' ? 'Únicamente cubrimos Boca del Monte' : 'Recolección incluida · seguro hasta Q500';
+        quotePrice = 'Q' + price;
+      } else {
+        quoteTitle = svcLabel + ' a ' + dest.name;
+        quoteNote = 'Escríbenos para cotizar este destino';
+        quotePrice = '—';
+      }
+    }
+    // ---- Rastreo ----
+    const tr = this.state.trackResult;
+    const badgeMap = {
+      pending: { c: '#2563EB', b: '#EFF6FF' },
+      pickup: { c: '#2563EB', b: '#EFF6FF' },
+      assigned: { c: '#2563EB', b: '#EFF6FF' },
+      in_transit: { c: '#2E7D28', b: '#F0F9EF' },
+      delivered: { c: '#2E7D28', b: '#F0F9EF' },
+      incident: { c: '#B91C1C', b: '#FEF2F2' },
+      attempted_delivery: { c: '#B91C1C', b: '#FEF2F2' },
+      cancelled: { c: '#B91C1C', b: '#FEF2F2' },
+      devolution: { c: '#B45309', b: '#FFFBEB' },
+      returned: { c: '#1D4ED8', b: '#EFF6FF' }
+    };
+    let trackSteps = [], trackMetaRows = [], trackBadgeLabel = '', trackBadgeColor = '', trackBadgeBg = '', trackResultCode = '', trackNote = '';
+    if (tr) {
+      trackResultCode = tr.orderId || '';
+      trackSteps = this.buildSteps(tr.state).map(s => ({
+        ...s,
+        dateStr: (tr.stateTime && tr.stateTime[s.key]) ? this.fmtDate(tr.stateTime[s.key]) : ''
+      }));
+      const lbl = (this.STATE_LABELS[tr.state] || {}).label || tr.state;
+      const bm = badgeMap[tr.state] || { c: '#334155', b: '#F1F5F9' };
+      trackBadgeLabel = lbl; trackBadgeColor = bm.c; trackBadgeBg = bm.b;
+      if (tr.updatedAt) trackMetaRows.push({ k: 'Última actualización', v: this.fmtDate(tr.updatedAt) });
+      if (tr.deliveredTo) trackMetaRows.push({ k: 'Recibido por', v: tr.deliveredTo });
+      if (Array.isArray(tr.attempts) && tr.attempts.length) {
+        trackMetaRows.push({ k: 'Intentos de entrega', v: String(tr.attempts.length) });
+        const last = tr.attempts[tr.attempts.length - 1];
+        if (last && last.comment) trackMetaRows.push({ k: 'Nota del mensajero', v: last.comment });
+      }
+      if (this.state.trackDemo) trackNote = 'Vista previa (modo demo). Publicado en un dominio autorizado de Dropper, se conecta al rastreo real.';
+    }
+
+    return {
+      trackCode: this.state.trackCode,
+      onTrackChange: (e) => this.setState({ trackCode: e.target.value }),
+      onTrackKey: (e) => { if (e.key === 'Enter') this.doTrack(); },
+      doTrack: () => this.doTrack(),
+      trackBtnLabel: this.state.trackLoading ? 'Buscando…' : 'Rastrear',
+      trackError: this.state.trackError,
+      trackShow: !!tr,
+      trackResultCode,
+      trackSteps,
+      trackBadgeLabel, trackBadgeColor, trackBadgeBg,
+      trackHasMeta: trackMetaRows.length > 0,
+      trackMetaRows,
+      trackNote,
+      municipios: this.municipios,
+      quoteDest: this.state.quoteDest,
+      quoteService: this.state.quoteService,
+      onDestChange: (e) => this.setState({ quoteDest: e.target.value }),
+      onServiceChange: (e) => this.setState({ quoteService: e.target.value }),
+      hasQuote: !!dest,
+      quoteTitle, quoteNote, quotePrice,
+      accent,
+      isTrack,
+      isQuote: !isTrack,
+      setModeTrack: () => this.setState({ mode: 'track' }),
+      setModeQuote: () => this.setState({ mode: 'quote' }),
+      trackTabBg: isTrack ? '#FFFFFF' : 'transparent',
+      trackTabColor: isTrack ? '#0B1220' : '#64748B',
+      quoteTabBg: !isTrack ? '#FFFFFF' : 'transparent',
+      quoteTabColor: !isTrack ? '#0B1220' : '#64748B',
+      services: [
+        { icon: '📦', title: 'Estándar', desc: 'Entrega en 24–48 horas en la capital y municipios cercanos, con seguro incluido hasta Q500 por paquete.', meta: 'Desde Q25' },
+        { icon: '⚡', title: 'Express', desc: 'Entrega el mismo día dentro de la ciudad. Ideal para documentos y urgencias.', meta: 'Desde Q40' },
+        { icon: '🛒', title: 'E-commerce', desc: 'Conecta tu tienda, imprime guías en lote y deja que tus clientes rastreen solos. Tú solo empaca.', meta: 'Tarifas por volumen' }
+      ],
+      steps: [
+        { n: '1', title: 'Cotiza en línea', desc: 'Ingresa origen, destino y peso. El precio que ves es el precio que pagas.' },
+        { n: '2', title: 'Agenda la recolección', desc: 'Pasamos por tu paquete el mismo día o cuando tú lo decidas.' },
+        { n: '3', title: 'Sigue la entrega en vivo', desc: 'Tú y tu destinatario reciben el enlace de rastreo con ubicación en tiempo real.' }
+      ],
+      stats: [
+        { value: '98.4%', label: 'entregas a tiempo' },
+        { value: '45 min', label: 'recolección promedio' },
+        { value: '8', label: 'municipios cubiertos' },
+        { value: '4.9★', label: 'calificación de clientes' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
