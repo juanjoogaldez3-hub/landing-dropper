@@ -1,0 +1,5 @@
+# Redirige el rastreo a la funcion serverless
+[[redirects]]
+  from = "/api/v1/tracking/*"
+  to = "/.netlify/functions/track?guia=:splat"
+  status = 200

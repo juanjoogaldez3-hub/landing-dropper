@@ -1,47 +1,48 @@
-# Landing Dropper
+# Landing Dropper — versión Netlify
 
-Sitio web de Dropper (mensajería) con cotizador y rastreo en vivo conectado a Sendabox.
+Sitio de Dropper con cotizador y rastreo en vivo. Alternativa a Vercel: evita
+por completo el conflicto de "reclamar dominio" que aparece cuando el apex ya está
+en otra cuenta de Vercel.
 
-## Estructura
+## Archivos
 
 ```
-index.html                     → el sitio (landing + cotizador + rastreo)
-support.js                     → runtime del sitio (no editar)
-api/v1/tracking/[guia].js      → proxy de rastreo (función serverless)
+index.html                      → el sitio
+support.js                      → runtime del sitio (no editar)
+netlify.toml                    → redirige /api/v1/tracking/<GUIA> a la función
+netlify/functions/track.js      → proxy de rastreo (función serverless)
 ```
 
-## Cómo funciona el rastreo
+## Desplegar en Netlify (gratis)
 
-El sitio llama a `/api/v1/tracking/<GUIA>` en su **propio dominio**. Esa ruta es una
-función serverless que reenvía la petición al endpoint **público** de Sendabox
-agregando el header `x-tenant-id: droppergt`.
+**Opción A — arrastrar y soltar (sin GitHub):**
+1. Entra a https://app.netlify.com → **Add new site → Deploy manually**.
+2. Arrastra **el contenido de esta carpeta** a la zona de subida.
+3. Listo, queda en `https://<algo>.netlify.app`.
 
-Como la llamada a Sendabox se hace **servidor-a-servidor**, no aplica la restricción
-CORS del navegador: **funciona desde cualquier dominio sin pedirle nada a Sendabox.**
+**Opción B — con GitHub (re-deploy automático):**
+1. Sube esta carpeta a un repo de GitHub.
+2. Netlify → **Add new site → Import from Git** → elige el repo → **Deploy**.
 
-## Desplegar en Vercel (recomendado, gratis)
+Netlify detecta `netlify/functions/track.js` como función automáticamente.
 
-1. Sube esta carpeta a un repositorio de GitHub (por ejemplo `landing-dropper`).
-2. Entra a https://vercel.com → **Add New → Project** → importa el repo.
-3. Framework Preset: **Other**. Deja todo por defecto y da **Deploy**.
-4. Vercel detecta `api/v1/tracking/[guia].js` como función automáticamente.
-5. Listo: tu sitio queda en `https://<tu-proyecto>.vercel.app` con rastreo en vivo.
+## Conectar tu dominio `droppergt.com` (desde GoDaddy)
 
-## Desplegar en Netlify
+Como la landing NO está en Vercel, no hay "claim". Solo apuntas el DNS:
 
-Igual de simple, pero las funciones van en otra carpeta. Si prefieres Netlify,
-avísame y te dejo la versión con `netlify/functions/`.
+1. En Netlify → **Domain settings → Add a domain** → escribe `droppergt.com`.
+2. Netlify te dará los registros. Con DNS en GoDaddy, lo normal es:
+   - Apex `@`: registro **A** → `75.2.60.5`  (usa el valor que te muestre Netlify)
+   - `www`: **CNAME** → `<tu-sitio>.netlify.app`
+3. En **GoDaddy → DNS**, crea/edita esos registros.
+   - **NO toques el registro de `app`** — ese es el sistema en Vercel y se queda igual.
+4. Espera la propagación (minutos a ~1h). Netlify activa el HTTPS solo.
 
-## Probar el rastreo
+> `app.droppergt.com` sigue en la cuenta de Vercel de tu developer, intacto:
+> tú solo cambias los registros `@` y `www`, no el de `app`.
 
-Abre el sitio publicado, pestaña **Rastrear**, e ingresa una guía real
-(ej. una que esté *en camino* o *entregada*). Verás la línea de tiempo con las
-fechas reales de cada estado.
+## Probar
 
-> En vista previa local (sin la función serverless corriendo) el rastreo muestra
-> datos de **demostración**; en el sitio desplegado usa datos reales.
-
-## Ajustes
-
-Colores de marca, `apiBase` y `tenantId` se pueden cambiar desde el panel de
-Tweaks del editor. Para producción con proxy, deja `apiBase` en `/api/v1`.
+Pestaña **Rastrear** → ingresa una guía real. Debe mostrar la línea de tiempo con
+fechas reales. Prueba directa de la función:
+`https://tudominio.com/api/v1/tracking/DR-XXXXXXXX` → debe devolver un JSON.
